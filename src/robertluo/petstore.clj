@@ -1,17 +1,9 @@
 (ns robertluo.petstore
   (:require [io.pedestal.http :as http]
             [com.walmartlabs.lacinia.pedestal2 :as lp]
-            [com.walmartlabs.lacinia.schema :as schema]
-            [robertluo.fun-map :as fm :refer [fnk]]))
+            [robertluo.fun-map :as fm :refer [fnk]]
+            [robertluo.schema :as sc]))
 
-(def hello-schema
-  (schema/compile
-   {:queries
-    {:hello
-      ;; String is quoted here; in EDN the quotation is not required
-     {:type 'String
-      :description "A simple greeting."
-      :resolve (constantly "world")}}}))
 
 (defn system
   "create system from config"
@@ -19,7 +11,7 @@
   (fm/life-cycle-map
    #:system
    {:config config
-    :schema hello-schema
+    :schema sc/hello-schema
     :service 
     (fnk [:system/schema :system/config]
          (lp/default-service schema config))
