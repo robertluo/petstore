@@ -1,0 +1,17 @@
+{:objects
+ {:Pet
+  {:description "Pet infomation"
+   :fields
+   {:id {:type (non-null ID)}
+    :name {:type (non-null String)}
+    :tag {:type String}}}}
+ :queries
+ {:pets
+  {:type (list :Pet)
+   :description "returns all pets."
+   :resolve :query/pets}
+  :pet
+  {:type :Pet
+   :args {:id {:type (non-null ID)}}
+   :description "returns pet of id"
+   :resolve :query/pet-by-id}}}
