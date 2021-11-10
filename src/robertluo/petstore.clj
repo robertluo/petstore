@@ -1,7 +1,8 @@
 (ns robertluo.petstore
   (:require [io.pedestal.http :as http]
             [com.walmartlabs.lacinia.pedestal2 :as lp]
-            [com.walmartlabs.lacinia.schema :as schema]))
+            [com.walmartlabs.lacinia.schema :as schema]
+            [robertluo.fun-map :as fm :refer [fnk]]))
 
 (def hello-schema
   (schema/compile
@@ -9,17 +10,36 @@
     {:hello
       ;; String is quoted here; in EDN the quotation is not required
      {:type 'String
+      :description "A simple greeting."
       :resolve (constantly "world")}}}))
 
-;; Use default options:
-(def service (lp/default-service hello-schema nil))
+(defn system
+  "create system from config"
+  [config]
+  (fm/life-cycle-map
+   #:system
+   {:config config
+    :schema hello-schema
+    :service 
+    (fnk [:system/schema :system/config]
+         (lp/default-service schema config))
+    :server
+    (fnk [:system/service]
+         (let [http-server
+               (-> (http/create-server service)
+                   (http/start))]
+           (fm/closeable http-server #(http/stop http-server))))}))
 
-;; This is an adapted service map, that can be started and stopped
-;; From the REPL you can call server/start and server/stop on this service
-(defonce runnable-service (http/create-server service))
+(defn start-system []
+  (fm/touch (system nil)))
+
+(comment
+  (def instance (start-system))
+  (fm/halt! instance)
+  )
 
 (defn -main
   "The entry-point for 'lein run'"
   [& _]
   (println "\nCreating your server...")
-  (http/start runnable-service))
+  (start-system))

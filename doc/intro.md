@@ -1,3 +1,4 @@
 # Introduction to petstore
 
-TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
+## Getting started
+Follow the readme of lacinia-pedestal, starting from a hello world schema. 
